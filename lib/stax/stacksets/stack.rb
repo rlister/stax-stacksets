@@ -17,7 +17,11 @@ module Stax
         debug("Creating stackset #{my.stack_set_name}")
         Aws::Cfn.client.create_stack_set(
           stack_set_name: my.stack_set_name,
+          description: my.stack_set_name,
           template_body: my.stack_template,
+          tags: [
+            {key: :Name, value: my.stack_set_name}
+          ]
         )&.stack_set_id.tap(&method(:puts))
         Aws::Cfn.client.create_stack_instances(
           stack_set_name: my.stack_set_name,
@@ -50,7 +54,7 @@ module Stax
           fail_task(r.status) if r.status == 'FAILED'
           break if r.status == 'SUCCEEDED'
           puts "#{r.action} is #{r.status}, waiting ..."
-          sleep(3)
+          sleep(5)
         end
 
         ## delete stack set
